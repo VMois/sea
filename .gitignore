@@ -1,0 +1,4 @@
+raw-data/*
+!raw-data/.gitkeep
+.idea/
+audio-features.parquet.gzip
