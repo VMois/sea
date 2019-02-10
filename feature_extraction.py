@@ -7,7 +7,7 @@ This script will automatically unzip, analyze, and save a pandas data frame cont
 ********* Instructions ************
 1) Download Audio_Speech_Actors_01-24.zip and Audio_Song_Actors_01-24.zip from https://zenodo.org/record/1188976
 2) Place these zip files in a folder called raw-data in the main directory.
-3) The results are stored in the Apache Parquet format with gzip compression in a file called 'audio-features.parquet.gzip' located in the main directory.
+3) The results are stored in the Apache Parquet format in a file called 'audio-features.parquet' located in the main directory.
 ***********************************
 
 RAVDESS filename identifiers:
@@ -131,14 +131,14 @@ if os.path.isfile('raw-data/Audio_Speech_Actors_01-24.zip') and os.path.isfile('
   shutil.rmtree('raw-data/audio-files')  
 
   # Save the data frame.
-  if os.path.exists('audio-features.parquet.gzip'):
-    os.remove('audio-features.parquet.gzip')
-  features_dataframe.to_parquet('audio-features.parquet.gzip', compression='gzip')
+  if os.path.exists('audio-features.parquet'):
+    os.remove('audio-features.parquet')
+  features_dataframe.to_parquet('audio-features.parquet', engine='pyarrow')
   pd.set_option('display.expand_frame_repr', False)
   end = time.time()
   print('Successfully analyzed', len(features_dataframe.index), 'audio files.')
   print('This script took ', str(round(end - start, 2)), 'seconds to execute.')
-  print('The data frame file has been saved to audio-features.parquet.gzip.')
+  print('The data frame file has been saved to audio-features.parquet.')
   print('Data frame preview of the first 5 rows:')
   print(features_dataframe[:5])
     
