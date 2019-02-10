@@ -1,14 +1,17 @@
 # Speech Emotion Analysis
+
 A neural network model for determining human speech emotions from audio recordings.
 
 Based on https://github.com/MITESHPUTHRANNEU/Speech-Emotion-Analyzer
 
 ## Prerequisites
+
 * A 64-bit Windows, Linux, or Mac OS machine (certain libraries such as pyarrow don't work on 32-bit machines)
 * The Conda package and environment manager https://conda.io/projects/conda/en/latest/user-guide/install/index.html
 * The Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS) https://zenodo.org/record/1188976
 
 ## How to start
+
 1. Install Conda through Miniconda/Anaconda
 2. Clone the repo
 3. Create Conda environment using `conda env create -f env.yml`
@@ -20,6 +23,7 @@ Based on https://github.com/MITESHPUTHRANNEU/Speech-Emotion-Analyzer
 9. The results (filename, gender, emotion, and features) are stored with the Apache Parquet format in a file called `audio-features.parquet` located in the main directory
 
 ## Libraries
+
 * LibROSA (https://librosa.github.io/librosa/)
 * TensorFlow (https://www.tensorflow.org/)
 * Scikit-learn (https://scikit-learn.org/)
