@@ -14,7 +14,7 @@ Based on https://github.com/MITESHPUTHRANNEU/Speech-Emotion-Analyzer
 
 1. Install Conda through Miniconda/Anaconda
 2. Clone the repo
-3. Create Conda environment using `conda env create -f env.yml`
+3. Create Conda environment using `conda env create -f env.yaml`
 4. Activate the enviroment with `source activate sea`
 5. Install Tensorflow for CPU using `conda install tensorflow=1.12.0` (or `tensorflow-gpu` for GPU support)
 6. Download `Audio_Speech_Actors_01-24.zip` and `Audio_Song_Actors_01-24.zip` from https://zenodo.org/record/1188976
