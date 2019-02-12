@@ -17,10 +17,11 @@ Based on https://github.com/MITESHPUTHRANNEU/Speech-Emotion-Analyzer
 3. Create Conda environment using `conda env create -f env.yaml`
 4. Activate the enviroment with `source activate sea`
 5. Install Tensorflow for CPU using `conda install tensorflow=1.12.0` (or `tensorflow-gpu` for GPU support)
-6. Download `Audio_Speech_Actors_01-24.zip` and `Audio_Song_Actors_01-24.zip` from https://zenodo.org/record/1188976
-7. Place these zip files in a folder called `raw-data` in the main directory
-8. Run `python feature_extraction.py` to analyze and extract audio features (this may take a few minutes)
-9. The results (filename, gender, emotion, and features) are stored with the Apache Parquet format in a file called `audio-features.parquet` located in the main directory
+6. Install keras using `conda install keras=2.2.4` 
+7. Download `Audio_Speech_Actors_01-24.zip` and `Audio_Song_Actors_01-24.zip` from https://zenodo.org/record/1188976
+8. Place these zip files in a folder called `raw-data` in the main directory
+9. Run `python feature_extraction.py` to analyze and extract audio features (this may take a few minutes)
+10. The results (filename, gender, emotion, and features) are stored with the Apache Parquet format in a file called `audio-features.parquet` located in the main directory
 
 ## Libraries
 
