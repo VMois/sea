@@ -43,7 +43,7 @@ Hdata=shuffle(Hdata)
 i = np.random.rand(len(Hdata)) < 0.8
 train = Hdata[i]
 test = Hdata[~i]
-'''
+
 trainfeatures = train.iloc[:,[-1]]
 trainlabel = train.iloc[:,[-2]]
 testfeatures = test.iloc[:,[-1]]
@@ -58,7 +58,7 @@ y_test = np.array(testlabel)
 x_traincnn =np.expand_dims(X_train, axis=2)
 x_testcnn= np.expand_dims(X_test, axis=2)
 
-
+'''
 y_train = np_utils.to_categorical(lb.fit_transform(y_train))
 y_test = np_utils.to_categorical(lb.fit_transform(y_test))
 '''
