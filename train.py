@@ -29,17 +29,18 @@ test_emotions = tf.keras.utils.to_categorical(lb.fit_transform(test_emotions))
 train_features_cnn = np.expand_dims(train_features, axis=2)
 test_features_cnn = np.expand_dims(test_features, axis=2)
 
+#print (train_features)
 
 model = tf.keras.Sequential()
 
 model.add(layers.Conv1D(256, 5, padding='same', input_shape=(216, 1)))
-model.add(layers.Activation('relu'))
+model.add(layers.Activation('sigmoid'))
 model.add(layers.Conv1D(128, 5, padding='same'))
-model.add(layers.Activation('relu'))
+model.add(layers.Activation('sigmoid'))
 model.add(layers.Dropout(0.1))
 model.add(layers.MaxPooling1D(pool_size=(8)))
 model.add(layers.Conv1D(128, 5, padding='same',))
-model.add(layers.Activation('relu'))
+model.add(layers.Activation('sigmoid'))
 
 # model.add(layers.Conv1D(128, 5,padding='same',))
 # model.add(layers.Activation('relu'))
@@ -48,19 +49,20 @@ model.add(layers.Activation('relu'))
 # model.add(layers.Dropout(0.2))
 
 model.add(layers.Conv1D(128, 5,padding='same',))
-model.add(layers.Activation('relu'))
+model.add(layers.Activation('sigmoid'))
 model.add(layers.Flatten())
 model.add(layers.Dense(10))
 model.add(layers.Activation('softmax'))
-opt = tf.keras.optimizers.RMSprop(lr=0.00001, decay=1e-6)
+opt = tf.keras.optimizers.RMSprop(lr=0.0001, decay=1e-3)
 
-model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
+
+model.compile(loss='categorical_crossentropy', optimizer=opt,metrics=['accuracy'])
 
 cnnhistory = model.fit(train_features_cnn,
                       train_emotions,
                       batch_size=16,
-                      epochs=700,
+                      epochs=10000,
                       validation_data=(test_features_cnn, test_emotions))
 
 plt.plot(cnnhistory.history['loss'])
