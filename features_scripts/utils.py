@@ -1,8 +1,22 @@
 import os
+import librosa
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 from sklearn.utils import shuffle
+
+
+def extract_features(filename_path: str, offset: float, duration: float, sample_rate: int):
+    x, sample_rate = librosa.load(filename_path,
+                                  res_type='kaiser_fast',
+                                  duration=duration,
+                                  sr=sample_rate,
+                                  offset=offset)
+    sample_rate = np.array(sample_rate)
+
+    # Extract audio features by taking an arithmetic mean of 13 identified MFCCs.
+    # https://librosa.github.io/librosa/generated/librosa.feature.mfcc.html
+    return np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=13), axis=0)
 
 
 def save_dataframe(df, purpose: str, dataset_name: str):

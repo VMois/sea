@@ -17,9 +17,8 @@ import os.path
 import zipfile
 import shutil
 import pandas as pd
-import librosa
-import numpy as np
-from .utils import save_dataframe, separate_dataframe_on_train_and_test
+from .utils import save_dataframe, \
+    separate_dataframe_on_train_and_test, extract_features
 
 
 def label_to_emotion(label: int):
@@ -80,14 +79,10 @@ def ravdess_extract():
             # Sample rate: 44,100 Hz
             # Duration: 2.5 seconds
             # Skip time: 0.5 seconds from the beginning
-            # Window function: Kaiser https://en.wikipedia.org/wiki/Kaiser_window
-            x, sample_rate = librosa.load(os.path.join(root, file), res_type='kaiser_fast', duration=2.5, sr=22050 * 2,
-                                          offset=0.5)
-            sample_rate = np.array(sample_rate)
-
-            # Extract audio features by taking an arithmetic mean of 13 identified MFCCs.
-            # https://librosa.github.io/librosa/generated/librosa.feature.mfcc.html
-            feature = np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=13), axis=0)
+            feature = extract_features(os.path.join(root, file),
+                                       offset=0.5,
+                                       duration=2.5,
+                                       sample_rate=22050 * 2)
 
             features_df = features_df.append({
                 'filename': file,
