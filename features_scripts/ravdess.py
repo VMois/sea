@@ -37,11 +37,11 @@ def label_to_emotion(label: int):
 
 
 def ravdess_extract():
-    required_zip_filenames = ['Audio_Speech_Actors_01-24', 'Audio_Speech_Actors_01-24']
+    required_zip_filenames = ['Audio_Speech_Actors_01-24.zip', 'Audio_Speech_Actors_01-24.zip']
     allowed_emotions = [2, 3, 4, 5, 6]
 
     for filename in required_zip_filenames:
-        if not os.path.isfile('raw-data/{}'.format(filename)):
+        if not os.path.isfile('raw-data/{0}'.format(filename)):
             print(
                 'Please download Audio_Speech_Actors_01-24.zip '
                 'and Audio_Song_Actors_01-24.zip from https://zenodo.org/record/1188976'
@@ -57,7 +57,7 @@ def ravdess_extract():
 
     # Unzip the files above into raw-data/ravdess
     for zip_filename in required_zip_filenames:
-        zip_ref = zipfile.ZipFile('raw-data/{0}.zip'.format(zip_filename), 'r')
+        zip_ref = zipfile.ZipFile('raw-data/{0}'.format(zip_filename), 'r')
         zip_ref.extractall('raw-data/ravdess')
         zip_ref.close()
 
