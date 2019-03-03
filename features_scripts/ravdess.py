@@ -40,19 +40,20 @@ def ravdess_extract():
     required_zip_filenames = ['Audio_Speech_Actors_01-24', 'Audio_Speech_Actors_01-24']
     allowed_emotions = [2, 3, 4, 5, 6]
 
-    if not (os.path.isfile('raw-data/Audio_Speech_Actors_01-24.zip') and os.path.isfile(
-            'raw-data/Audio_Speech_Actors_01-24.zip')):
-        print(
-            'Please download Audio_Speech_Actors_01-24.zip '
-            'and Audio_Song_Actors_01-24.zip from https://zenodo.org/record/1188976'
-        )
-        print('Place these files in a folder called raw-data/ in the main directory.')
-        return
+    for filename in required_zip_filenames:
+        if not os.path.isfile('raw-data/{}'.format(filename)):
+            print(
+                'Please download Audio_Speech_Actors_01-24.zip '
+                'and Audio_Song_Actors_01-24.zip from https://zenodo.org/record/1188976'
+            )
+            print('Place these files in a folder called raw-data/ in the main directory.')
+            return
 
     if not os.path.exists('raw-data/ravdess'):
         os.makedirs('raw-data/ravdess')
     else:
         shutil.rmtree('raw-data/ravdess')
+        os.makedirs('raw-data/ravdess')
 
     # Unzip the files above into raw-data/ravdess
     for zip_filename in required_zip_filenames:

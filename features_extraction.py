@@ -1,5 +1,5 @@
 import os
-from features_extraction_scripts.ravdess import ravdess_extract
+from features_scripts.ravdess import ravdess_extract
 
 
 if not os.path.exists('raw-data'):
