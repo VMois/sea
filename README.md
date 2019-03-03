@@ -8,29 +8,41 @@ Based on https://github.com/MITESHPUTHRANNEU/Speech-Emotion-Analyzer
 
 * A 64-bit Windows, Linux, or Mac OS machine (certain libraries such as pyarrow don't work on 32-bit machines)
 * The Conda package and environment manager https://conda.io/projects/conda/en/latest/user-guide/install/index.html
+
+## Datasets
+
 * The Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS) https://zenodo.org/record/1188976
+* more in future... 
 
 ## How to start
 
+### Prepare environment
 1. Install Conda through Miniconda/Anaconda
 2. Clone the repo
 3. Create Conda environment using `conda env create -f env.yaml`
 4. Activate the enviroment with `source activate sea`
 5. Install Tensorflow for CPU using `conda install tensorflow=1.12.0` (or `tensorflow-gpu` for GPU support)
-6. Install keras using `conda install keras=2.2.4` 
-7. Download `Audio_Speech_Actors_01-24.zip` and `Audio_Song_Actors_01-24.zip` from https://zenodo.org/record/1188976
-8. Place these zip files in a folder called `raw-data` in the main directory
-9. Run `python feature_extraction.py` to analyze and extract audio features (this may take a few minutes)
-10. The results (filename, gender, emotion, and features) are stored with the Apache Parquet format in a file called `audio-features.parquet` located in the main directory
+6. Install keras using `conda install keras=2.2.4`
 
-## Libraries
+### Prepare data
 
-* LibROSA (https://librosa.github.io/librosa/)
-* TensorFlow (https://www.tensorflow.org/)
-* Scikit-learn (https://scikit-learn.org/)
-* Numpy (http://www.numpy.org/)
-* Matplotlib (https://matplotlib.org/)
-* Pandas (https://pandas.pydata.org/)
-* Scipy (https://www.scipy.org/)
-* Apache Arrow (https://arrow.apache.org/docs/python/)
-* Apache Parquet (https://parquet.apache.org/)
+#### RAVDESS dataset
+1. Download `Audio_Speech_Actors_01-24.zip` and `Audio_Song_Actors_01-24.zip` from https://zenodo.org/record/1188976
+2. Place these zip files in a folder called `raw-data` in the main directory
+
+#### more datasets...
+
+#### Extract features
+1. Run `python features_extraction.py` to analyze and extract audio features (this may take a few minutes)
+2. The results are stored in the Apache Parquet format 
+in a directories `data/train/[dataset_name].parquet` and `data/test/[dataset_name].parquet`.
+
+## Parquet data structure (in progress...)
+
+Features from all datasets are combined to unified format. 
+All features are stored in parquet files with following structure: 
+
+- **filename**: name of the original audio file
+- **gender**: 'male' or 'female' voice
+- **emotion**: basic emotions ('neutral', 'calm', 'happy', 'sad', 'angry', 'fearful', 'disgust', 'surprise')
+- **features**: MFCC features (detailed description will be added soon)
