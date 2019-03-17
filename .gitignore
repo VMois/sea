@@ -1,4 +1,6 @@
 raw-data/*
+data/*
 !raw-data/.gitkeep
 .idea/
+__pycache__/
 audio-features.parquet
