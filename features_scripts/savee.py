@@ -63,10 +63,10 @@ def savee_extract():
     features_df = pd.DataFrame(columns=columns_list)
 
     for root, dirs, files in os.walk('raw-data/savee'):
-        for file in files:
-            if not file.endswith('.wav'):
+        for filename in files:
+            if not filename.endswith('.wav'):
                 continue
-            filename_no_ext = file.split('.')[0]
+            filename_no_ext = filename.split('.')[0]
             map_emo = {
                     'n': 1,
                     'h': 3,
@@ -76,7 +76,7 @@ def savee_extract():
                     'd': 7,
                     'su': 8,
                 }
-            identifiers=filename_no_ext[0:len(filename_no_ext)-2]
+            identifiers = filename_no_ext[0:len(filename_no_ext)-2]
             emotion = int(map_emo[str(identifiers)])
             gender = 'male'
 
@@ -86,13 +86,13 @@ def savee_extract():
             # Sample rate: 44,100 Hz
             # Duration: 2.5 seconds
             # Skip time: 0.5 seconds from the beginning
-            feature = extract_features(os.path.join(root, file),
+            feature = extract_features(os.path.join(root, filename),
                                        offset=0.5,
                                        duration=2.5,
                                        sample_rate=22050 * 2)
 
             features_df = features_df.append({
-                'filename': file,
+                'filename': filename,
                 'emotion': label_to_emotion(emotion),
                 'gender': gender,
                 'features': feature,
