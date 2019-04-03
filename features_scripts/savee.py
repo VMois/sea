@@ -26,7 +26,7 @@ def label_to_emotion(label: int):
 
 def savee_extract():
     required_zip_filenames = ['AudioData.zip']
-    allowed_emotions = [1, 3, 4, 5, 6, 7, 8]
+    allowed_emotions = [2, 3, 4, 5, 6]
 
     for filename in required_zip_filenames:
         if not os.path.isfile('raw-data/{0}'.format(filename)):

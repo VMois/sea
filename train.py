@@ -4,17 +4,10 @@ import tensorflow as tf
 import tensorflow.keras.layers as layers
 import pyarrow.parquet as pq
 import matplotlib.pyplot as plt
-from sklearn.utils import shuffle
 from sklearn.preprocessing import LabelEncoder
 
-data = pq.read_pandas('audio-features.parquet').to_pandas()
-data = shuffle(data)
-
-# https://stackoverflow.com/questions/24147278/how-do-i-create-test-and-train-samples-from-one-dataframe-with-pandas
-msk = np.random.rand(len(data)) < 0.8
-
-train_data = data[msk]
-test_data = data[~msk]
+train_data = pq.read_pandas('data/train/').to_pandas()
+test_data = pq.read_pandas('data/test/').to_pandas()
 
 train_features = np.array(pd.concat([pd.DataFrame(train_data['features'].values.tolist())], axis=1))
 train_emotions = (train_data['gender'].map(str) + '_' + train_data['emotion']).values
@@ -29,7 +22,6 @@ test_emotions = tf.keras.utils.to_categorical(lb.fit_transform(test_emotions))
 
 train_features_cnn = np.expand_dims(train_features, axis=2)
 test_features_cnn = np.expand_dims(test_features, axis=2)
-
 
 model = tf.keras.Sequential()
 
