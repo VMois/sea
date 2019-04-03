@@ -16,7 +16,10 @@ def extract_features(filename_path: str, offset: float, duration: float, sample_
 
     # Extract audio features by taking an arithmetic mean of 13 identified MFCCs.
     # https://librosa.github.io/librosa/generated/librosa.feature.mfcc.html
-    return np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=13), axis=0)
+    result = np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=13), axis=0)
+    if len(result) != 216:
+        return None
+    return result
 
 
 def save_dataframe(df, purpose: str, dataset_name: str):
@@ -29,7 +32,7 @@ def save_dataframe(df, purpose: str, dataset_name: str):
     dest_path = 'data/{0}/{1}.parquet'.format(purpose, dataset_name)
     if os.path.exists(dest_path):
         os.remove(dest_path)
-    table = pa.Table.from_pandas(df)
+    table = pa.Table.from_pandas(df, preserve_index=False)
     pq.write_table(table, dest_path)
 
 

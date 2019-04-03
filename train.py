@@ -6,15 +6,14 @@ import pyarrow.parquet as pq
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 
-train_data = pq.read_pandas('data/train/').to_pandas()
-test_data = pq.read_pandas('data/test/').to_pandas()
+train_data = pq.read_pandas('data/train/').to_pandas().dropna()
+test_data = pq.read_pandas('data/test/').to_pandas().dropna()
 
-train_features = np.array(pd.concat([pd.DataFrame(train_data['features'].values.tolist())], axis=1))
+train_features = np.array(pd.DataFrame(train_data['features'].values.tolist()).fillna(0))
 train_emotions = (train_data['gender'].map(str) + '_' + train_data['emotion']).values
 
-test_features = np.array(pd.concat([pd.DataFrame(test_data['features'].values.tolist())], axis=1))
+test_features = np.array(pd.DataFrame(test_data['features'].values.tolist()).fillna(0))
 test_emotions = (test_data['gender'].map(str) + '_' + test_data['emotion']).values
-
 lb = LabelEncoder()
 
 train_emotions = tf.keras.utils.to_categorical(lb.fit_transform(train_emotions))
