@@ -1,17 +1,6 @@
 '''
-BME AI - Speech Emotion Analysis - RAVDESS Extraction script
+BME AI - Speech Emotion Analysis - SAVEE Extraction script
 ------------------------------------------------------------
-
-RAVDESS filename identifiers:
-  
-  Modality (01 = full-AV, 02 = video-only, 03 = audio-only).
-  Vocal channel (01 = speech, 02 = song).
-  Emotion (01 = neutral, 02 = calm, 03 = happy, 04 = sad, 05 = angry, 06 = fearful, 07 = disgust, 08 = surprised).
-  Emotional intensity (01 = normal, 02 = strong). NOTE: There is no strong intensity for the 'neutral' emotion.
-  Statement (01 = 'Kids are talking by the door', 02 = 'Dogs are sitting by the door').
-  Repetition (01 = 1st repetition, 02 = 2nd repetition).
-  Actor (01 to 24. Odd numbered actors are male, even numbered actors are female).
-
 '''
 import os.path
 import zipfile
@@ -61,21 +50,21 @@ def savee_extract():
 
     columns_list = ['filename', 'gender', 'emotion', 'features']
     features_df = pd.DataFrame(columns=columns_list)
-
+    map_emo = {
+        'n': 1,
+        'h': 3,
+        'sa': 4,
+        'a': 5,
+        'f': 6,
+        'd': 7,
+        'su': 8,
+    }
     for root, dirs, files in os.walk('raw-data/savee'):
         for filename in files:
             if not filename.endswith('.wav'):
                 continue
             filename_no_ext = filename.split('.')[0]
-            map_emo = {
-                    'n': 1,
-                    'h': 3,
-                    'sa': 4,
-                    'a': 5,
-                    'f': 6,
-                    'd': 7,
-                    'su': 8,
-                }
+
             identifiers = filename_no_ext[0:len(filename_no_ext)-2]
             emotion = int(map_emo[str(identifiers)])
             gender = 'male'
