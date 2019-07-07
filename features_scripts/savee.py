@@ -1,5 +1,5 @@
 '''
-BME AI - Speech Emotion Analysis - RAVDESS Extraction script
+BME AI - Speech Emotion Analysis - SAVEE Extraction script
 ------------------------------------------------------------
 '''
 import os.path
@@ -24,43 +24,50 @@ def label_to_emotion(label: int):
     return emotions[label]
 
 
-def ravdess_extract():
-    required_zip_filenames = ['Audio_Speech_Actors_01-24.zip', 'Audio_Speech_Actors_01-24.zip']
-    allowed_emotions = [2, 3, 4, 5, 6]
+def savee_extract():
+    required_zip_filenames = ['AudioData.zip']
+    allowed_emotions = [1, 3, 4, 5, 6, 7, 8]
 
     for filename in required_zip_filenames:
         if not os.path.isfile('raw-data/{0}'.format(filename)):
             print(
-                'Please download Audio_Speech_Actors_01-24.zip '
-                'and Audio_Song_Actors_01-24.zip from https://zenodo.org/record/1188976'
+                'Please download AudioData.zip '
             )
             print('Place these files in a folder called raw-data/ in the main directory.')
             return
 
-    if not os.path.exists('raw-data/ravdess'):
-        os.makedirs('raw-data/ravdess')
+    if not os.path.exists('raw-data/savee'):
+        os.makedirs('raw-data/savee')
     else:
-        shutil.rmtree('raw-data/ravdess')
-        os.makedirs('raw-data/ravdess')
+        shutil.rmtree('raw-data/savee')
+        os.makedirs('raw-data/savee')
 
     # Unzip the files above into raw-data/ravdess
     for zip_filename in required_zip_filenames:
         zip_ref = zipfile.ZipFile('raw-data/{0}'.format(zip_filename), 'r')
-        zip_ref.extractall('raw-data/ravdess')
+        zip_ref.extractall('raw-data/savee')
         zip_ref.close()
 
     columns_list = ['filename', 'gender', 'emotion', 'features']
     features_df = pd.DataFrame(columns=columns_list)
-
-    for root, dirs, files in os.walk('raw-data/ravdess'):
+    map_emo = {
+        'n': 1,
+        'h': 3,
+        'sa': 4,
+        'a': 5,
+        'f': 6,
+        'd': 7,
+        'su': 8,
+    }
+    for root, dirs, files in os.walk('raw-data/savee'):
         for filename in files:
             if not filename.endswith('.wav'):
                 continue
-
             filename_no_ext = filename.split('.')[0]
-            identifiers = filename_no_ext.split('-')
-            emotion = int(identifiers[2])
-            gender = 'male' if int(identifiers[6]) % 2 == 1 else 'female'
+
+            identifiers = filename_no_ext[0:len(filename_no_ext)-2]
+            emotion = int(map_emo[str(identifiers)])
+            gender = 'male'
 
             if emotion not in allowed_emotions:
                 continue
@@ -82,10 +89,10 @@ def ravdess_extract():
 
     train_df, test_df = separate_dataframe_on_train_and_test(features_df)
 
-    save_dataframe(train_df, 'train', 'ravdess')
-    save_dataframe(test_df, 'test', 'ravdess')
-    print('Successfully saved', len(features_df), 'audio files for RAVDESS')
+    save_dataframe(train_df, 'train', 'savee')
+    save_dataframe(test_df, 'test', 'savee')
+    print('Successfully saved', len(features_df), 'audio files for savee')
     print('- train data: ', len(train_df))
     print('- test data: ', len(test_df))
 
-    shutil.rmtree('raw-data/ravdess')
+    shutil.rmtree('raw-data/savee')
