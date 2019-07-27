@@ -6,7 +6,7 @@ import pyarrow.parquet as pq
 from sklearn.utils import shuffle
 
 
-def extract_features(filename_path: str, offset: float, duration: float, sample_rate: int):
+def extract_mfcc_features(filename_path: str, offset: float, duration: float, sample_rate: int):
     x, sample_rate = librosa.load(filename_path,
                                   res_type='kaiser_fast',
                                   duration=duration,
@@ -19,14 +19,16 @@ def extract_features(filename_path: str, offset: float, duration: float, sample_
     return np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=13), axis=0)
 
 
-def save_dataframe(df, purpose: str, dataset_name: str):
+def save_dataframe(df, dataset_name: str, purpose: str):
     '''
     :param df: Dataframe to save
-    :param purpose: train or test
+    :param purpose: purpose of file
     :param dataset_name: unique name of the saved dataset
     :return: None
     '''
-    dest_path = 'data/{0}/{1}.parquet'.format(purpose, dataset_name)
+    root = os.path.join('data', dataset_name)
+    os.makedirs(root, exist_ok=True)
+    dest_path = os.path.join(root, '{0}.parquet'.format(purpose))
     if os.path.exists(dest_path):
         os.remove(dest_path)
     table = pa.Table.from_pandas(df)

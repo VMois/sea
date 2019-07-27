@@ -5,9 +5,11 @@ BME AI - Speech Emotion Analysis - RAVDESS Extraction script
 import os.path
 import zipfile
 import shutil
+import logging
 import pandas as pd
-from .utils import save_dataframe, \
-    separate_dataframe_on_train_and_test, extract_features
+from .utils import save_dataframe, extract_mfcc_features
+
+logging.basicConfig(level=logging.INFO)
 
 
 def label_to_emotion(label: int):
@@ -24,8 +26,8 @@ def label_to_emotion(label: int):
     return emotions[label]
 
 
-def ravdess_extract():
-    required_zip_filenames = ['Audio_Speech_Actors_01-24.zip', 'Audio_Speech_Actors_01-24.zip']
+def ravdess_extract(dataset_id: int):
+    required_zip_filenames = ['Audio_Speech_Actors_01-24.zip', 'Audio_Song_Actors_01-24.zip']
     allowed_emotions = [2, 3, 4, 5, 6]
 
     for filename in required_zip_filenames:
@@ -37,55 +39,57 @@ def ravdess_extract():
             print('Place these files in a folder called raw-data/ in the main directory.')
             return
 
-    if not os.path.exists('raw-data/ravdess'):
-        os.makedirs('raw-data/ravdess')
+    dest_dir = 'raw-data/ravdess'
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
     else:
-        shutil.rmtree('raw-data/ravdess')
-        os.makedirs('raw-data/ravdess')
+        shutil.rmtree(dest_dir)
+        os.makedirs(dest_dir)
 
     # Unzip the files above into raw-data/ravdess
     for zip_filename in required_zip_filenames:
-        zip_ref = zipfile.ZipFile('raw-data/{0}'.format(zip_filename), 'r')
-        zip_ref.extractall('raw-data/ravdess')
-        zip_ref.close()
+        with zipfile.ZipFile(os.path.join('raw-data/', zip_filename)) as zip_file:
+            for member in zip_file.namelist():
+                filename = os.path.basename(member)
+                if not filename:
+                    continue
 
-    columns_list = ['filename', 'gender', 'emotion', 'features']
+                # copy file (taken from zipfile's extract)
+                source = zip_file.open(member)
+                target = open(os.path.join(dest_dir, filename), 'wb')
+                with source, target:
+                    shutil.copyfileobj(source, target)
+
+    columns_list = ['id', 'filename', 'gender', 'emotion', 'features', 'actor_id']
     features_df = pd.DataFrame(columns=columns_list)
+    for index, filename in enumerate(os.listdir(dest_dir)):
+        if not filename.endswith('.wav'):
+            continue
 
-    for root, dirs, files in os.walk('raw-data/ravdess'):
-        for filename in files:
-            if not filename.endswith('.wav'):
-                continue
+        filename_no_ext = filename.split('.')[0]
+        identifiers = filename_no_ext.split('-')
+        emotion = int(identifiers[2])
+        actor_id = int(identifiers[6])
+        gender = 'male' if actor_id % 2 == 1 else 'female'
 
-            filename_no_ext = filename.split('.')[0]
-            identifiers = filename_no_ext.split('-')
-            emotion = int(identifiers[2])
-            gender = 'male' if int(identifiers[6]) % 2 == 1 else 'female'
+        if emotion not in allowed_emotions:
+            continue
 
-            if emotion not in allowed_emotions:
-                continue
+        feature = extract_mfcc_features(os.path.join(dest_dir, filename),
+                                        offset=0.5,
+                                        duration=2,
+                                        sample_rate=22050 * 2)
 
-            # Sample rate: 44,100 Hz
-            # Duration: 2.5 seconds
-            # Skip time: 0.5 seconds from the beginning
-            feature = extract_features(os.path.join(root, filename),
-                                       offset=0.5,
-                                       duration=2.5,
-                                       sample_rate=22050 * 2)
+        features_df = features_df.append({
+            'id': int(f'{dataset_id}{index}'),
+            'filename': filename,
+            'emotion': label_to_emotion(emotion),
+            'gender': gender,
+            'features': feature,
+            'actor_id': int(f'{dataset_id}{actor_id}'),
+        }, ignore_index=True)
 
-            features_df = features_df.append({
-                'filename': filename,
-                'emotion': label_to_emotion(emotion),
-                'gender': gender,
-                'features': feature,
-            }, ignore_index=True)
-
-    train_df, test_df = separate_dataframe_on_train_and_test(features_df)
-
-    save_dataframe(train_df, 'train', 'ravdess')
-    save_dataframe(test_df, 'test', 'ravdess')
-    print('Successfully saved', len(features_df), 'audio files for RAVDESS')
-    print('- train data: ', len(train_df))
-    print('- test data: ', len(test_df))
-
-    shutil.rmtree('raw-data/ravdess')
+    save_dataframe(features_df, 'ravdess', 'mfcc')
+    logging.info(features_df.head())
+    logging.info(f'Successfully saved {len(features_df)} audio files for RAVDESS')
+    shutil.rmtree(dest_dir)
