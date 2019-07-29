@@ -1,9 +1,10 @@
 import os
+import logging
 import librosa
+import pandas as pd
 import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
-from sklearn.utils import shuffle
 
 
 def extract_mfcc_features(filename_path: str, offset: float, duration: float, sample_rate: int):
@@ -19,11 +20,11 @@ def extract_mfcc_features(filename_path: str, offset: float, duration: float, sa
     return np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=13), axis=0)
 
 
-def save_dataframe(df, dataset_name: str, purpose: str):
+def save_dataframe(df: pd.DataFrame, dataset_name: str, purpose: str):
     '''
     :param df: Dataframe to save
-    :param purpose: purpose of file
     :param dataset_name: unique name of the saved dataset
+    :param purpose: purpose of file
     :return: None
     '''
     root = os.path.join('data', dataset_name)
@@ -33,13 +34,5 @@ def save_dataframe(df, dataset_name: str, purpose: str):
         os.remove(dest_path)
     table = pa.Table.from_pandas(df)
     pq.write_table(table, dest_path)
-
-
-def separate_dataframe_on_train_and_test(df):
-    # TODO: Improve separation by label tag
-    # https://stackoverflow.com/questions/24147278/how-do-i-create-test-and-train-samples-from-one-dataframe-with-pandas
-    df = shuffle(df)
-    msk = np.random.rand(len(df)) < 0.8
-    train_data = df[msk]
-    test_data = df[~msk]
-    return train_data, test_data
+    logging.info(f'Saved {len(df)} records for {dataset_name} in {purpose}')
+    logging.info(df.head())

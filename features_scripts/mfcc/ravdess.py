@@ -5,21 +5,19 @@ BME AI - Speech Emotion Analysis - RAVDESS Extraction script
 import os.path
 import zipfile
 import shutil
-import logging
 import pandas as pd
-from .utils import save_dataframe, extract_mfcc_features
-
-logging.basicConfig(level=logging.INFO)
+from features_scripts.utils import save_dataframe, extract_mfcc_features
+from features_scripts.mfcc.config import COLUMNS
 
 
 def label_to_emotion(label: int):
     emotions = {
         1: 'neutral',
-        2: 'calm',
+        2: 'neutral',  # originally "calm"
         3: 'happy',
         4: 'sad',
         5: 'angry',
-        6: 'fearful',
+        6: 'fear',
         7: 'disgust',
         8: 'surprise',
     }
@@ -28,7 +26,6 @@ def label_to_emotion(label: int):
 
 def ravdess_extract(dataset_id: int):
     required_zip_filenames = ['Audio_Speech_Actors_01-24.zip', 'Audio_Song_Actors_01-24.zip']
-    allowed_emotions = [2, 3, 4, 5, 6]
 
     for filename in required_zip_filenames:
         if not os.path.isfile('raw-data/{0}'.format(filename)):
@@ -60,8 +57,7 @@ def ravdess_extract(dataset_id: int):
                 with source, target:
                     shutil.copyfileobj(source, target)
 
-    columns_list = ['id', 'filename', 'gender', 'emotion', 'features', 'actor_id']
-    features_df = pd.DataFrame(columns=columns_list)
+    features_df = pd.DataFrame(columns=COLUMNS)
     for index, filename in enumerate(os.listdir(dest_dir)):
         if not filename.endswith('.wav'):
             continue
@@ -71,9 +67,6 @@ def ravdess_extract(dataset_id: int):
         emotion = int(identifiers[2])
         actor_id = int(identifiers[6])
         gender = 'male' if actor_id % 2 == 1 else 'female'
-
-        if emotion not in allowed_emotions:
-            continue
 
         feature = extract_mfcc_features(os.path.join(dest_dir, filename),
                                         offset=0.5,
@@ -90,6 +83,4 @@ def ravdess_extract(dataset_id: int):
         }, ignore_index=True)
 
     save_dataframe(features_df, 'ravdess', 'mfcc')
-    logging.info(features_df.head())
-    logging.info(f'Successfully saved {len(features_df)} audio files for RAVDESS')
     shutil.rmtree(dest_dir)

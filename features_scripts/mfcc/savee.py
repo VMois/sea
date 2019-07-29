@@ -4,40 +4,22 @@ BME AI - Speech Emotion Analysis - SAVEE Extraction script
 '''
 import os.path
 import pandas as pd
-import logging
-from .utils import save_dataframe, extract_mfcc_features
-
-logging.basicConfig(level=logging.INFO)
-
-
-def label_to_emotion(label: int):
-    emotions = {
-        1: 'neutral',
-        2: 'calm',
-        3: 'happy',
-        4: 'sad',
-        5: 'angry',
-        6: 'fearful',
-        7: 'disgust',
-        8: 'surprise',
-    }
-    return emotions[label]
+from features_scripts.utils import save_dataframe, extract_mfcc_features
+from features_scripts.mfcc.config import COLUMNS
 
 
 def savee_extract(dataset_id: int):
-    allowed_emotions = [1, 3, 4, 5, 6]
     actors = ['DC', 'JE', 'JK', 'KL']
 
-    columns_list = ['id', 'filename', 'gender', 'emotion', 'features', 'actor_id']
-    features_df = pd.DataFrame(columns=columns_list)
+    features_df = pd.DataFrame(columns=COLUMNS)
     map_emo = {
-        'n': 1,
-        'h': 3,
-        'sa': 4,
-        'a': 5,
-        'f': 6,
-        'd': 7,
-        'su': 8,
+        'n': 'neutral',
+        'h': 'happy',
+        'sa': 'sad',
+        'a': 'angry',
+        'f': 'fear',
+        'd': 'disgust',
+        'su': 'surprise',
     }
     audio_id = 0
     for index, actor in enumerate(actors):
@@ -50,11 +32,8 @@ def savee_extract(dataset_id: int):
             filename_no_ext = filename.split('.')[0]
 
             identifiers = filename_no_ext[0:len(filename_no_ext) - 2]
-            emotion = int(map_emo[str(identifiers)])
+            emotion = map_emo[str(identifiers)]
             gender = 'male'
-
-            if emotion not in allowed_emotions:
-                continue
 
             feature = extract_mfcc_features(os.path.join(root, filename),
                                             offset=0.5,
@@ -64,7 +43,7 @@ def savee_extract(dataset_id: int):
             features_df = features_df.append({
                 'id': int(f'{dataset_id}{audio_id}'),
                 'filename': filename,
-                'emotion': label_to_emotion(emotion),
+                'emotion': emotion,
                 'gender': gender,
                 'actor_id': actor_id,
                 'features': feature,
@@ -72,5 +51,3 @@ def savee_extract(dataset_id: int):
 
             audio_id += 1
     save_dataframe(features_df, 'savee', 'mfcc')
-    logging.info(features_df.head())
-    logging.info(f'Successfully saved {len(features_df)} audio files for SAVEE')

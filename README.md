@@ -2,13 +2,27 @@
 
 A neural network model for determining human speech emotions from audio recordings.
 
-## Datasets
+## Project structure
+
+### Datasets
 
 | id        | name          |
 | ------------- |:-------------:|
 | 1 | The Ryerson Audio-Visual Database of Emotional Speech and Song (RAVDESS) |
 | 2 | SAVEE |
 | 3 | CREMA-D (Crowd-sourced Emotional Mutimodal Actors Dataset) |
+
+### Emotions
+
+We are using names for emotions:
+
+- happy
+- surprise
+- sad
+- angry
+- disgust
+- fear
+- neutral
 
 ## How to start
 
