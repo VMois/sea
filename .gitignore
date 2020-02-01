@@ -5,3 +5,4 @@ img/
 .idea/
 __pycache__/
 audio-features.parquet
+.ipynb_checkpoints/
