@@ -1,10 +1,8 @@
 import os
 import logging
 import librosa
-import pandas as pd
 import numpy as np
-import pyarrow as pa
-import pyarrow.parquet as pq
+import matplotlib.pyplot as plt
 
 
 def extract_mfcc_features(filename_path: str, offset: float, duration: float, sample_rate: int):
@@ -19,20 +17,18 @@ def extract_mfcc_features(filename_path: str, offset: float, duration: float, sa
     # https://librosa.github.io/librosa/generated/librosa.feature.mfcc.html
     return np.mean(librosa.feature.mfcc(y=x, sr=sample_rate, n_mfcc=13), axis=0)
 
-
-def save_dataframe(df: pd.DataFrame, dataset_name: str, purpose: str):
-    '''
-    :param df: Dataframe to save
-    :param dataset_name: unique name of the saved dataset
-    :param purpose: purpose of file
-    :return: None
-    '''
-    root = os.path.join('data', dataset_name)
-    os.makedirs(root, exist_ok=True)
-    dest_path = os.path.join(root, '{0}.parquet'.format(purpose))
-    if os.path.exists(dest_path):
-        os.remove(dest_path)
-    table = pa.Table.from_pandas(df)
-    pq.write_table(table, dest_path)
-    logging.info(f'Saved {len(df)} records for {dataset_name} in {purpose}')
-    logging.info(df.head())
+def extract_mel_spec_as_image(src_path: str, dst_path: str):
+    x, sample_rate = librosa.load(src_path,
+                                  res_type='kaiser_fast',
+                                  duration=1.5,
+                                  sr=22050 * 2,
+                                  offset=0.5)
+    n_fft = 1024
+    hop_length = 256
+    n_mels = 40
+    f_min = 20
+    f_max = 8000
+    mel_spec = librosa.feature.melspectrogram(x, n_fft=n_fft, hop_length=hop_length, n_mels=n_mels, sr=sample_rate, power=1.0, 
+    fmin=f_min, fmax=f_max)
+    mel_spec_db = librosa.amplitude_to_db(mel_spec, ref=np.max)
+    plt.imsave(dst_path, mel_spec_db)

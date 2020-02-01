@@ -1,8 +1,8 @@
 import os
 import logging
-from features_scripts.mfcc.crema import crema_extract
-from features_scripts.mfcc.ravdess import ravdess_extract
-from features_scripts.mfcc.savee import savee_extract
+from features_scripts.images.crema import crema_extract
+from features_scripts.images.ravdess import ravdess_extract
+from features_scripts.images.savee import savee_extract
 
 logging.basicConfig(level=logging.INFO)
 
